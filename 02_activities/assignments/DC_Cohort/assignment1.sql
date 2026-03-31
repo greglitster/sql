@@ -127,7 +127,7 @@ FROM customer_purchases
 JOIN customer 
 	ON customer_purchases.customer_id = customer.customer_id
 GROUP BY customer_purchases.customer_id
-HAVING total_spent >2000
+HAVING total_spent > 2000
 ORDER BY customer_last_name, customer_first_name
 
 
@@ -146,14 +146,19 @@ When inserting the new vendor, you need to appropriately align the columns to be
 VALUES(col1,col2,col3,col4,col5) 
 */
 --QUERY 10
+DROP TABLE IF EXISTS temp.new_vendor; -- dropping table if it already exists
 
+CREATE TABLE temp.new_vendor AS
+SELECT *
+FROM vendor;
 
-
+INSERT INTO temp.new_vendor
+VALUES (10, 'Thomas Superfood Store', 'Fresh Focused', 'Thomas','Rosenthal')
 
 --END QUERY
 
 
--- Date
+-- Date (NOT COMPLETED BECUASE NOT COVERED)
 /*1. Get the customer_id, month, and year (in separate columns) of every purchase in the customer_purchases table.
 
 HINT: you might need to search for strfrtime modifers sqlite on the web to know what the modifers for month 
