@@ -158,14 +158,19 @@ VALUES (10, 'Thomas Superfood Store', 'Fresh Focused', 'Thomas','Rosenthal')
 --END QUERY
 
 
--- Date (NOT COMPLETED BECUASE NOT COVERED)
+-- Date 
 /*1. Get the customer_id, month, and year (in separate columns) of every purchase in the customer_purchases table.
 
 HINT: you might need to search for strfrtime modifers sqlite on the web to know what the modifers for month 
 and year are! 
 Limit to 25 rows of output. */
 --QUERY 11
-
+SELECT 
+	customer_id,
+	STRFTIME('%m', market_date) as month,
+	STRFTIME('%Y', market_date) as year
+FROM customer_purchases
+LIMIT 25; 
 
 
 
@@ -179,8 +184,15 @@ HINTS: you will need to AGGREGATE, GROUP BY, and filter...
 but remember, STRFTIME returns a STRING for your WHERE statement...
 AND be sure you remove the LIMIT from the previous query before aggregating!! */
 --QUERY 12
-
-
+SELECT 
+	customer_id,
+	SUM(quantity*cost_to_customer_per_qty) as total_spent,
+	STRFTIME('%m', market_date) as month,
+	STRFTIME('%Y', market_date) as year
+FROM customer_purchases
+WHERE STRFTIME('%m', market_date) = '04'
+  AND STRFTIME('%Y', market_date) = '2022'
+GROUP BY customer_id
 
 
 --END QUERY
