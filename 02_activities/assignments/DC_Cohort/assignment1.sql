@@ -6,19 +6,17 @@
 --SELECT
 /* 1. Write a query that returns everything in the customer table. */
 --QUERY 1
-
-
-
-
+SELECT *
+FROM customer;
 --END QUERY
 
-
 /* 2. Write a query that displays all of the columns and 10 rows from the customer table, 
-sorted by customer_last_name, then customer_first_ name. */
+sorted by customer_last_name, then customer_first_name. */
 --QUERY 2
-
-
-
+SELECT *
+FROM customer;
+ORDER BY customer_last_name, customer_first_name
+LIMIT 10;
 
 --END QUERY
 
@@ -27,10 +25,10 @@ sorted by customer_last_name, then customer_first_ name. */
 /* 1. Write a query that returns all customer purchases of product IDs 4 and 9. 
 Limit to 25 rows of output. */
 --QUERY 3
-
-
-
-
+SELECT *
+FROM customer_purchases
+WHERE product_id IN (4,9)
+LIMIT 25;
 --END QUERY
 
 
@@ -42,9 +40,10 @@ filtered by customer IDs between 8 and 10 (inclusive) using either:
 Limit to 25 rows of output.
 */
 --QUERY 4
-
-
-
+SELECT *, quantity * cost_to_customer_per_qty AS price 
+FROM customer_purchases
+WHERE customer_id BETWEEN 8 AND 10
+LIMIT 25;
 
 --END QUERY
 
@@ -55,9 +54,12 @@ Using the product table, write a query that outputs the product_id and product_n
 columns and add a column called prod_qty_type_condensed that displays the word “unit” 
 if the product_qty_type is “unit,” and otherwise displays the word “bulk.” */
 --QUERY 5
-
-
-
+SELECT product_id, product_name
+,CASE
+	WHEN product_qty_type = 'unit' THEN 'unit'
+	ELSE 'bulk'
+END as product_qty_type_condensed
+FROM product;
 
 --END QUERY
 
@@ -66,9 +68,16 @@ if the product_qty_type is “unit,” and otherwise displays the word “bulk.�
 add a column to the previous query called pepper_flag that outputs a 1 if the product_name 
 contains the word “pepper” (regardless of capitalization), and otherwise outputs 0. */
 --QUERY 6
-
-
-
+SELECT product_id, product_name
+,CASE
+	WHEN product_qty_type = 'unit' THEN 'unit'
+	ELSE 'bulk'
+END as product_qty_type_condensed
+,CASE
+	WHEN product_name LIKE '%pepper%' THEN 1
+	ELSE 0
+END as pepper_flag
+FROM product;
 
 --END QUERY
 
@@ -78,12 +87,14 @@ contains the word “pepper” (regardless of capitalization), and otherwise out
 vendor_id field they both have in common, and sorts the result by market_date, then vendor_name.
 Limit to 24 rows of output. */
 --QUERY 7
-
-
-
+SELECT * 
+FROM vendor
+INNER JOIN vendor_booth_assignments
+	ON vendor.vendor_id = vendor_booth_assignments.vendor_id
+ORDER BY market_date, vendor_name
+LIMIT 25;
 
 --END QUERY
-
 
 
 /* SECTION 3 */
@@ -92,9 +103,11 @@ Limit to 24 rows of output. */
 /* 1. Write a query that determines how many times each vendor has rented a booth 
 at the farmer’s market by counting the vendor booth assignments per vendor_id. */
 --QUERY 8
-
-
-
+SELECT 
+vendor_id,
+	COUNT(market_date) as vendor_booth_count
+FROM vendor_booth_assignments
+GROUP BY vendor_id;
 
 --END QUERY
 
@@ -105,8 +118,17 @@ of customers for them to give stickers to, sorted by last name, then first name.
 
 HINT: This query requires you to join two tables, use an aggregate function, and use the HAVING keyword. */
 --QUERY 9
-
-
+SELECT 
+	customer_purchases.customer_id, 
+	customer_first_name, 
+	customer_last_name,
+	SUM(quantity*cost_to_customer_per_qty) as total_spent
+FROM customer_purchases
+JOIN customer 
+	ON customer_purchases.customer_id = customer.customer_id
+GROUP BY customer_purchases.customer_id
+HAVING total_spent > 2000
+ORDER BY customer_last_name, customer_first_name
 
 
 --END QUERY
@@ -124,21 +146,31 @@ When inserting the new vendor, you need to appropriately align the columns to be
 VALUES(col1,col2,col3,col4,col5) 
 */
 --QUERY 10
+DROP TABLE IF EXISTS temp.new_vendor; -- dropping table if it already exists
 
+CREATE TABLE temp.new_vendor AS
+SELECT *
+FROM vendor;
 
-
+INSERT INTO temp.new_vendor
+VALUES (10, 'Thomas Superfood Store', 'Fresh Focused', 'Thomas','Rosenthal')
 
 --END QUERY
 
 
--- Date
+-- Date 
 /*1. Get the customer_id, month, and year (in separate columns) of every purchase in the customer_purchases table.
 
 HINT: you might need to search for strfrtime modifers sqlite on the web to know what the modifers for month 
 and year are! 
 Limit to 25 rows of output. */
 --QUERY 11
-
+SELECT 
+	customer_id,
+	STRFTIME('%m', market_date) as month,
+	STRFTIME('%Y', market_date) as year
+FROM customer_purchases
+LIMIT 25; 
 
 
 
@@ -152,8 +184,15 @@ HINTS: you will need to AGGREGATE, GROUP BY, and filter...
 but remember, STRFTIME returns a STRING for your WHERE statement...
 AND be sure you remove the LIMIT from the previous query before aggregating!! */
 --QUERY 12
-
-
+SELECT 
+	customer_id,
+	SUM(quantity*cost_to_customer_per_qty) as total_spent,
+	STRFTIME('%m', market_date) as month,
+	STRFTIME('%Y', market_date) as year
+FROM customer_purchases
+WHERE STRFTIME('%m', market_date) = '04'
+  AND STRFTIME('%Y', market_date) = '2022'
+GROUP BY customer_id
 
 
 --END QUERY
