@@ -136,7 +136,7 @@ FROM product
 SELECT
 product_id, 
 product_name, 
-roduct_size
+product_size
 FROM product
 WHERE product_size REGEXP '\d'
 
