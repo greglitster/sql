@@ -56,7 +56,11 @@ The store wants to keep customer addresses. Propose two architectures for the CU
 **HINT:** search type 1 vs type 2 slowly changing dimensions. 
 
 ```
-Your answer...
+The customer_address table would include fields like customer_id (PK) and an address, likely stored as as a single string (e.g., '55 St. George St., Toronto, ON, M5S 0C9'). If you wanted more specificity you could add each element of an address to its own field (e.g., street_number, street_name, city, province/territory, and postal code) though this might not be necessary depending on the use case.
+
+The overwrite option (Type 1) would need to replace the entire string of inside the 'address' field with a new address. You could do this using UPDATE. This would not keep the information about where that customer lived previously and completely replace that data. 
+
+The retain changes option (Type 2) would need to structure the table by having two fields to describe the address. The first would be called current_address and the second additional field called previous_address would be required to retain the old address. There would need to be some logic introduced using ALTER that updates previous_address when a new current_address is added. This is useful if you care about where your customers are located and wanted to make comparisons over time, though it is more memory intensive because now you have more data to retain. It would also introduce more sparse data because you may have many customers who rarely move or don't update their addresses. 
 ```
 
 ***
@@ -191,5 +195,5 @@ Consider, for example, concepts of labour, bias, LLM proliferation, moderating c
 
 
 ```
-Your thoughts...
+This was a really interesting article that demonstrates the history and incredible human hours that have gone into training AI systems that we use today. I find the discussions around compensation and fairness for labelling training data to be really complex. On one hand, it opens up some really useful ways to increase offerings in the job market as labelling jobs can be relatively straightforward for most people and can be offer accessible work environments. However, when it comes to content moderation there are some real dangers that need to be considered especially for labelling dangerous content. The psychological effects of labelling offensive, dangerous or disturbing images and text over time can be drastic. There should be safeguards for those employees put in place, which will require many nuanced conversations for those developing these systems. 
 ```
